@@ -1,7 +1,7 @@
 {
   "name": "html-ghost-migration",
   "version": "0.0.1",
-  "description": "Extract website articles and insert them into Ghost.",
+  "description": "Extract html website articles and insert them into Ghost.",
   "main": "bin/app.js",
   "scripts": {
     "start": "node ./bin/app.js",
