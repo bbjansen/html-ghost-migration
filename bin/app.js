@@ -5,7 +5,7 @@
 
 // config
 require('dotenv').config();
-addaddconst DOM = require('../config/dom');
+const DOM = require('../config/dom');
 const Articles = require('../config/articles.json');
 const Authors = require('../config/authors.json');
 
