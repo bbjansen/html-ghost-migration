@@ -6,7 +6,10 @@
 - Excerpt won't store.
 
 ## Usage
-Define the article slugs in `config/articles.json` without including the base URL of the blog. Define the author names used on the static blog and couple a Ghost account to it by email in `config/authors.json`. Set the scraping atributes in `config/dom.js` to match the html website.
+1. Define the article slugs in `config/articles.json` without including the base URL of the blog.
+2. Define the author names used on the static blog and couple a Ghost account to it by email in `config/authors.json`.
+3. Set the scraping atributes in `config/dom.js` to match the html website.
+4. Adjust the locale publishing date in `config/locale.js`.
 
 ### Environment
 ```

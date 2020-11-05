@@ -3,12 +3,6 @@
 // Please see the included LICENSE file for more information.
 'use strict'
 
-// config
-require('dotenv').config();
-const DOM = require('../config/dom');
-const Articles = require('../config/articles.json');
-const Authors = require('../config/authors.json');
-
 // modules
 const GhostAdminAPI = require('@tryghost/admin-api');
 const converter = require('@tryghost/html-to-mobiledoc');
@@ -16,6 +10,12 @@ const { extract } = require('article-parser');
 const scrapeIt = require('scrape-it');
 const moment = require('moment');
 
+// config
+require('dotenv').config();
+const DOM = require('../config/dom');
+const Articles = require('../config/articles.json');
+const Authors = require('../config/authors.json');
+const Locale = require('../config/locale.json');
 
 (async () => {
     try {
@@ -42,11 +42,25 @@ const moment = require('moment');
                 return author.name === extractMeta.data.author
             })
 
+            // fetch date locale and covert
+            const trimmedDate = extractMeta.data.date.split(' op ')[1] 
+
+            const localeFilter = Locale.filter(local => {                
+                return trimmedDate.search(local.word) >= 0
+            })
+
+            let convertedDate
+            
+            if(localeFilter.length > 0) {
+                convertedDate = trimmedDate.replace(localeFilter[0].word, localeFilter[0].translation)
+            } else {
+                convertedDate = trimmedDate
+            }
 
             // parse properties
             const slug =  id.split('/')[1]
             const title = extractMeta.data.title
-            const date = moment(extractMeta.data.date.split(' op ')[1])
+            const date = moment(new Date(convertedDate)).format()
             const excerpt = extractHTML.content.split('</p>')[0].replace(/<p>/i, '').substring(0, 297) + '...'
             const image =  process.env.SITE_URL + extractMeta.data.image
             const body = JSON.stringify(converter.toMobiledoc(extractHTML.content))
@@ -67,8 +81,6 @@ const moment = require('moment');
                 mobiledoc: body,
                 status: 'published'
             }
-
-            //console.log(article)
 
             // insert into ghost
             await Ghost.posts.add(article)
