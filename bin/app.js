@@ -26,10 +26,10 @@ const scrapeIt = require("scrape-it");
             version: "v3"
         });
 
-        for (let slug of Articles) {
+        for (let id of Articles) {
 
             // configure url
-            const url = process.env.BLOG_URL + '/' + slug
+            const url = process.env.BLOG_URL + '/' + id
 
             // scrape
             const extractHTML = await extract(url)
@@ -41,21 +41,31 @@ const scrapeIt = require("scrape-it");
                 return author.name === extractMeta.data.author
             })
 
-            // create object
-            const article = {
-                slug: slug.split('/')[1],
-                title: extractMeta.data.title,
-                feature_image: process.env.SITE_URL + extractMeta.data.image,
-                authors: [author[0].email],
-                tags: [slug.split('/')[0]],
-                excerpt: extractHTML.content.split('</p>')[0].replace(/<p>/i, '').substring(0, 297) + '...',
-                status: 'published',
-                //html: extractHTML.content,
-                mobiledoc: converter.toMobiledoc(extractHTML.content)
 
+            // parse properties
+            const slug =  id.split('/')[1]
+            const title = extractMeta.data.title
+            const excerpt = extractHTML.content.split('</p>')[0].replace(/<p>/i, '').substring(0, 297) + '...'
+            const image =  process.env.SITE_URL + extractMeta.data.image
+            const body = JSON.stringify(converter.toMobiledoc(extractHTML.content))
+            const authors = [author[0].email]
+            const tags = [slug.split('/')[0]]
+
+            // create insert article object
+            const article = {
+                slug: slug,
+                title: title,
+                feature_image: image,
+                authors: authors,
+                tags: tags,
+                custom_excerpt: excerpt,
+                excerpt: excerpt,
+                email: authors[0],
+                mobiledoc: body,
+                status: 'published'
             }
 
-            console.log(article)
+            //console.log(article)
 
             // insert into ghost
             await Ghost.posts.add(article)
