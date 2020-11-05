@@ -5,15 +5,16 @@
 
 // config
 require('dotenv').config();
-const DOM = require("../config/dom");
-const Articles = require("../config/articles.json");
-const Authors = require("../config/authors.json");
+addaddconst DOM = require('../config/dom');
+const Articles = require('../config/articles.json');
+const Authors = require('../config/authors.json');
 
 // modules
 const GhostAdminAPI = require('@tryghost/admin-api');
 const converter = require('@tryghost/html-to-mobiledoc');
 const { extract } = require('article-parser');
-const scrapeIt = require("scrape-it");
+const scrapeIt = require('scrape-it');
+const moment = require('moment');
 
 
 (async () => {
@@ -45,6 +46,7 @@ const scrapeIt = require("scrape-it");
             // parse properties
             const slug =  id.split('/')[1]
             const title = extractMeta.data.title
+            const date = moment(extractMeta.data.date.split(' op ')[1])
             const excerpt = extractHTML.content.split('</p>')[0].replace(/<p>/i, '').substring(0, 297) + '...'
             const image =  process.env.SITE_URL + extractMeta.data.image
             const body = JSON.stringify(converter.toMobiledoc(extractHTML.content))
@@ -55,6 +57,7 @@ const scrapeIt = require("scrape-it");
             const article = {
                 slug: slug,
                 title: title,
+                published_at: date,
                 feature_image: image,
                 authors: authors,
                 tags: tags,
